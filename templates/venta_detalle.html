@@ -1,0 +1,138 @@
+<!-- venta_detalle.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1>Detalle de Venta #{{ venta.id }}</h1>
+    <a href="{{ url_for('ventas') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Información General</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID de Venta:</strong> {{ venta.id }}</p>
+                <p><strong>Fecha:</strong> {{ venta.fecha }}</p>
+                <p><strong>Total:</strong> ${{ "%.2f"|format(venta.total) }}</p>
+                <p><strong>Notas:</strong> {{ venta.notas if venta.notas else 'Sin notas' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Información del Cliente</h5>
+            </div>
+            <div class="card-body">
+                {% if venta.cliente %}
+                    <p><strong>Nombre:</strong> {{ venta.cliente.nombre }}</p>
+                    <p><strong>Email:</strong> {{ venta.cliente.email }}</p>
+                    <p><strong>Teléfono:</strong> {{ venta.cliente.telefono }}</p>
+                    <p><strong>Dirección:</strong> {{ venta.cliente.direccion }}</p>
+                {% else %}
+                    <p>Cliente no encontrado</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Productos Vendidos</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in venta["items"] %}
+                        <tr>
+                            <td>{{ item.producto.nombre if item.producto else 'Producto no encontrado' }}</td>
+                            <td>${{ "%.2f"|format(item.precio_unitario) }}</td>
+                            <td>{{ item.cantidad }}</td>
+                            <td>${{ "%.2f"|format(item.subtotal) }}</td>
+                            <td>
+                                {% if item.cantidad > 1 %}
+                                    <button type="button" class="btn btn-sm btn-outline-warning" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalEliminar{{ item.producto_id }}">
+                                        <i class="fas fa-minus"></i> Eliminar unidades
+                                    </button>
+                                    
+                                    <!-- Modal para eliminar unidades parciales -->
+                                    <div class="modal fade" id="modalEliminar{{ item.producto_id }}" tabindex="-1" aria-labelledby="modalEliminarLabel{{ item.producto_id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalEliminarLabel{{ item.producto_id }}">Eliminar unidades de {{ item.producto.nombre }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="{{ url_for('eliminar_unidades_producto_venta', venta_id=venta.id, producto_id=item.producto_id) }}" method="post">
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label for="cantidad_eliminar{{ item.producto_id }}" class="form-label">¿Cuántas unidades desea eliminar?</label>
+                                                            <input type="number" class="form-control" id="cantidad_eliminar{{ item.producto_id }}" 
+                                                                name="cantidad_eliminar" min="1" max="{{ item.cantidad }}" value="1" required>
+                                                            <small class="form-text text-muted">Actualmente hay {{ item.cantidad }} unidades en la venta</small>
+                                                        </div>
+                                                        <div class="alert alert-info">
+                                                            <i class="fas fa-info-circle"></i> Esta acción ajustará el subtotal de este producto y el total de la venta, y restaurará el stock del producto.
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-warning">Eliminar unidades</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <a href="{{ url_for('eliminar_producto_venta', venta_id=venta.id, producto_id=item.producto_id) }}" 
+                                   class="btn btn-sm btn-outline-danger" 
+                                   onclick="return confirm('¿Está seguro de que desea eliminar este producto completamente de la venta?')">
+                                    <i class="fas fa-times"></i> Eliminar todo
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-end">Total:</th>
+                        <th>${{ "%.2f"|format(venta.total) }}</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Inicializar modales de Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModalEl = document.getElementById('modalEliminar')
+        if (myModalEl) {
+            var modal = new bootstrap.Modal(myModalEl)
+        }
+    });
+</script>
+{% endblock %}

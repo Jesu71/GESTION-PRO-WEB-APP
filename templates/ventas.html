@@ -1,0 +1,75 @@
+<!-- ventas.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1>Gestión de Ventas</h1>
+    <div>
+        <a href="{{ url_for('papelera_ventas') }}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-trash-alt"></i> Papelera
+        </a>
+        <a href="{{ url_for('eliminar_todas_ventas') }}" class="btn btn-danger me-2" 
+           onclick="return confirm('¿Está seguro de que desea eliminar TODAS las ventas? Esta acción moverá todas las ventas a la papelera.')">
+            <i class="fas fa-trash"></i> Eliminar Todas
+        </a>
+        <a href="{{ url_for('nueva_venta') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nueva Venta
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">Lista de Ventas</h5>
+            </div>
+            <div class="col-md-6">
+                <form action="{{ url_for('ventas') }}" method="get" class="d-flex">
+                    <input type="text" name="busqueda" class="form-control me-2" placeholder="Buscar ventas..." value="{{ request.args.get('busqueda', '') }}">
+                    <button type="submit" class="btn btn-outline-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ventas %}
+                        {% for venta in ventas %}
+                        <tr>
+                            <td>{{ venta.id }}</td>
+                            <td>{{ venta.cliente_nombre }}</td>
+                            <td>{{ venta.fecha }}</td>
+                            <td>${{ "%.2f"|format(venta.total) }}</td>
+                            <td>
+                                <a href="{{ url_for('detalle_venta', id=venta.id) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-eye"></i> Detalle
+                                </a>
+                                <a href="{{ url_for('eliminar_venta', id=venta.id) }}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No se encontraron ventas</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

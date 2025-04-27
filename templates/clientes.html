@@ -1,0 +1,68 @@
+<!-- clientes.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1>Gestión de Clientes</h1>
+    <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Cliente
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">Lista de Clientes</h5>
+            </div>
+            <div class="col-md-6">
+                <form action="{{ url_for('clientes') }}" method="get" class="d-flex">
+                    <input type="text" name="busqueda" class="form-control me-2" placeholder="Buscar clientes..." value="{{ request.args.get('busqueda', '') }}">
+                    <button type="submit" class="btn btn-outline-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if clientes %}
+                        {% for cliente in clientes %}
+                        <tr>
+                            <td>{{ cliente.id }}</td>
+                            <td>{{ cliente.nombre }}</td>
+                            <td>{{ cliente.email }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td>{{ cliente.direccion }}</td>
+                            <td>
+                                <a href="{{ url_for('editar_cliente', id=cliente.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('eliminar_cliente', id=cliente.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Está seguro de que desea eliminar este cliente?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No se encontraron clientes</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
