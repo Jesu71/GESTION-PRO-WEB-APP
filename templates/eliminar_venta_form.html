@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Encabezado de la página para eliminar venta -->
+<div class="page-header">
+    <h1>Eliminar Venta</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- Mensaje de advertencia al usuario -->
+        <p class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> 
+            ¿Está seguro de que desea mover la venta #{{ venta_id }} a la papelera?
+        </p>
+        
+        <!-- Formulario para ingresar motivo de eliminación -->
+        <form method="post">
+            <div class="mb-3">
+                <label for="motivo" class="form-label">Motivo de eliminación</label>
+                <textarea class="form-control" id="motivo" name="motivo" rows="3" 
+                          placeholder="Indique el motivo por el cual está eliminando esta venta..." required></textarea>
+            </div>
+            
+            <!-- Botones para cancelar o confirmar eliminación -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ url_for('ventas') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Mover a Papelera
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

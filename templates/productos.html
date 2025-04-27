@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Encabezado de la página y botón para nuevo producto -->
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1>Gestión de Productos</h1>
+    <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Producto
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Título de la lista de productos -->
+                <h5 class="card-title mb-0">Lista de Productos</h5>
+            </div>
+            <div class="col-md-6">
+                <!-- Formulario de búsqueda de productos -->
+                <form action="{{ url_for('productos') }}" method="get" class="d-flex">
+                    <input type="text" name="busqueda" class="form-control me-2" placeholder="Buscar productos..." value="{{ request.args.get('busqueda', '') }}">
+                    <button type="submit" class="btn btn-outline-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <!-- Tabla de productos -->
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Muestra la lista de productos si existen -->
+                    {% if productos %}
+                        {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.id }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.categoria }}</td>
+                            <td>${{ "%.2f"|format(producto.precio) }}</td>
+                            <td>
+                                <!-- Badge de color según cantidad de stock -->
+                                <span class="badge {% if producto.stock > 10 %}bg-success{% elif producto.stock > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ producto.stock }}
+                                </span>
+                            </td>
+                            <td>
+                                <!-- Botón para editar producto -->
+                                <a href="{{ url_for('editar_producto', id=producto.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- Botón para eliminar producto -->
+                                <a href="{{ url_for('eliminar_producto', id=producto.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Está seguro de que desea eliminar este producto?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Mensaje si no hay productos -->
+                        <tr>
+                            <td colspan="6" class="text-center">No se encontraron productos</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Encabezado de la página para nueva venta -->
+<div class="page-header">
+    <h1>Nueva Venta</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- Formulario para registrar una nueva venta -->
+        <form method="post">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <!-- Selección de cliente -->
+                        <label for="cliente_id" class="form-label">Cliente</label>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
+                            <option value="">Seleccionar cliente</option>
+                            {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <!-- Selección de fecha de la venta -->
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" value="{{ now.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de productos para la venta -->
+            <h5 class="mb-3">Productos</h5>
+            <div class="table-responsive">
+                <!-- Tabla de productos disponibles -->
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Stock Disponible</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Itera sobre los productos para seleccionar cantidades -->
+                        {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto.nombre }}</td>
+                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>{{ producto.stock }}</td>
+                                <td>
+                                    <!-- Campo para ingresar cantidad a vender -->
+                                    <input type="number" class="form-control cantidad-producto" 
+                                           name="cantidad_{{ producto.id }}" min="0" max="{{ producto.stock }}" value="0" 
+                                           data-precio="{{ producto.precio }}">
+                                </td>
+                                <td>
+                                    <!-- Muestra el subtotal calculado para el producto -->
+                                    <span class="subtotal">$0.00</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <!-- Muestra el total de la venta -->
+                            <th colspan="4" class="text-end">Total:</th>
+                            <th><span id="total-venta">$0.00</span></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- Campo para notas adicionales de la venta -->
+            <div class="mb-4">
+                <label for="notas" class="form-label">Notas / Referencias</label>
+                <textarea class="form-control" id="notas" name="notas" rows="3" placeholder="Añade notas o referencias para esta venta..."></textarea>
+            </div>
+            <!-- Botones para cancelar o registrar la venta -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ url_for('ventas') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Registrar Venta</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Script para calcular subtotales y total en tiempo real -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cantidadInputs = document.querySelectorAll('.cantidad-producto');
+        
+        cantidadInputs.forEach(input => {
+            input.addEventListener('change', calcularTotal);
+            input.addEventListener('keyup', calcularTotal);
+        });
+        
+        function calcularTotal() {
+            let totalVenta = 0;
+            
+            cantidadInputs.forEach(input => {
+                const cantidad = parseInt(input.value) || 0;
+                const precio = parseFloat(input.dataset.precio);
+                const subtotal = cantidad * precio;
+                
+                const filaActual = input.closest('tr');
+                const subtotalCell = filaActual.querySelector('.subtotal');
+                subtotalCell.textContent = '$' + subtotal.toFixed(2);
+                
+                totalVenta += subtotal;
+            });
+            
+            document.getElementById('total-venta').textContent = '$' + totalVenta.toFixed(2);
+        }
+    });
+</script>
+{% endblock %}

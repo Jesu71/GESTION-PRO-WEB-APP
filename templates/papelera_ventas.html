@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Encabezado de la papelera con botones de navegación y vaciado -->
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1>Papelera de Ventas</h1>
+    <div>
+        <!-- Botón para volver a la lista de ventas -->
+        <a href="{{ url_for('ventas') }}" class="btn btn-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Volver a Ventas
+        </a>
+        <!-- Botón para vaciar la papelera -->
+        <a href="{{ url_for('vaciar_papelera') }}" class="btn btn-danger" 
+           onclick="return confirm('¿Está seguro de que desea vaciar la papelera? Esta acción eliminará permanentemente todas las ventas en la papelera y no se puede deshacer.')">
+            <i class="fas fa-trash"></i> Vaciar Papelera
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Título de la tabla de ventas eliminadas -->
+                <h5 class="card-title mb-0">Ventas Eliminadas</h5>
+            </div>
+            <div class="col-md-6">
+                <!-- Formulario de búsqueda en la papelera -->
+                <form action="{{ url_for('papelera_ventas') }}" method="get" class="d-flex">
+                    <input type="text" name="busqueda" class="form-control me-2" 
+                           placeholder="Buscar ventas eliminadas..." value="{{ request.args.get('busqueda', '') }}">
+                    <button type="submit" class="btn btn-outline-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <!-- Tabla de ventas eliminadas -->
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha Venta</th>
+                        <th>Fecha Eliminación</th>
+                        <th>Total</th>
+                        <th>Motivo Eliminación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ventas %}
+                        {% for venta in ventas %}
+                        <tr>
+                            <td>{{ venta.id }}</td>
+                            <td>{{ venta.cliente_nombre }}</td>
+                            <td>{{ venta.fecha }}</td>
+                            <td>{{ venta.fecha_eliminacion }}</td>
+                            <td>${{ "%.2f"|format(venta.total) }}</td>
+                            <td>
+                                <!-- Botón para ver el motivo de eliminación (tooltip) -->
+                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="{{ venta.motivo_eliminacion }}">
+                                    <i class="fas fa-info-circle"></i> Ver motivo
+                                </button>
+                            </td>
+                            <td>
+                                <!-- Botón para restaurar venta -->
+                                <a href="{{ url_for('restaurar_venta', id=venta.id) }}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-undo"></i> Restaurar
+                                </a>
+                                <!-- Botón para eliminar venta permanentemente -->
+                                <a href="{{ url_for('eliminar_venta_permanente', id=venta.id) }}" class="btn btn-sm btn-outline-danger" 
+                                   onclick="return confirm('¿Está seguro de que desea eliminar permanentemente esta venta? Esta acción no se puede deshacer.')">
+                                    <i class="fas fa-times"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Mensaje si no hay ventas en la papelera -->
+                        <tr>
+                            <td colspan="7" class="text-center">No hay ventas en la papelera</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Script para activar tooltips de Bootstrap -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

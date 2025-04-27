@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Encabezado de la página, muestra si es edición o nuevo cliente -->
+<div class="page-header">
+    <h1>{{ 'Editar Cliente' if cliente else 'Nuevo Cliente' }}</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- Formulario para crear o editar cliente -->
+        <form method="post">
+            <!-- Campo para el nombre del cliente -->
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ cliente.nombre if cliente else '' }}" required>
+            </div>
+            <!-- Campo para el email del cliente -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email if cliente else '' }}" required>
+            </div>
+            <!-- Campo para el teléfono del cliente -->
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" value="{{ cliente.telefono if cliente else '' }}" required>
+            </div>
+            <!-- Campo para la dirección del cliente -->
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ cliente.direccion if cliente else '' }}">
+            </div>
+            <!-- Botones para cancelar o guardar -->
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('clientes') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
