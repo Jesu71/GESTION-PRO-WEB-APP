@@ -1,0 +1,19 @@
+[
+    {
+        "id": 1,
+        "cliente_id": 1,
+        "fecha": "2025-04-27",
+        "items": [
+            {
+                "producto_id": 1,
+                "cantidad": 1,
+                "precio_unitario": 1000.0,
+                "subtotal": 1000.0
+            }
+        ],
+        "total": 1000.0,
+        "notas": "VENTA FIADA ",
+        "motivo_eliminacion": "PAGO DEUDA ",
+        "fecha_eliminacion": "2025-04-27 15:06:56"
+    }
+]
