@@ -4,4 +4,4 @@ Para hacer funcionar esto es necesario instalar flask al python desde consola
 
 pip install flask 
 
-nota: obviamente deben tener ya pip instalado y también actualizado, para que les funcione mejor usar la version 3.11.1 de 64 bits de python ahi es donde fue creado este portafolio mio. 
+nota: obviamente deben tener ya pip instalado y también actualizado, para que les funcione mejor usar la version 3.11.1 de 64 bits de python ahi es donde fue creada esta app
